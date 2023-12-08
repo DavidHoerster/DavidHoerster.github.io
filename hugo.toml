@@ -1,0 +1,19 @@
+baseURL = 'https://dave.agileways.com/'
+languageCode = 'en-us'
+title = 'Musings from AgileDave'
+theme = 'paper' 
+
+disqusShortname = 'agiledave'
+
+[params]
+color = 'light'
+twitter = 'DavidHoerster'
+github = 'DavidHoerster'
+linkedin = 'DavidHoerster'
+
+name = 'David Hoerster'
+bio = 'Some Dev Guy'
+avatar = 'dhoerster@gmail.com'
+
+comments = true
+disablePostNavigation = false
