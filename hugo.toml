@@ -1,4 +1,4 @@
-baseURL = 'https://dave.agileways.com/'
+BaseURL = 'https://dave.agileways.com/'
 languageCode = 'en-us'
 title = 'Musings from AgileDave'
 theme = 'paper' 
