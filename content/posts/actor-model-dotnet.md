@@ -25,6 +25,147 @@ So let's see the codez, right!! Let's use Akka.NET 1.5 to create a simple Actor 
 var system = ActorSystem.Create("helloAkka");
 ```
 
+And let's create the top level supervisor and pass a file to it that we want to get a word count:
 
+```csharp
+var counter = system.ActorOf(CountSupervisor.Create(), "supervisor");
+counter.Tell(new StartCount(file));
+```
+
+What does that message look like? Well it's a basic POCO class with a simple property on it:
+
+```csharp
+public class StartCount(String file)
+{
+    public readonly String FileName = file;
+}
+```
+
+And the `CountSupervisor` actor? There's a bit here, so let's take a look at what's going on:
+
+```csharp
+public class CountSupervisor : ReceiveActor
+{
+    public static Props Create()
+    {
+        return Props.Create(() => new CountSupervisor());
+    }
+
+    private Dictionary<String, Int32> _wordCount;
+    private readonly Int32 _numberOfRoutees;
+    private Int32 _completeRoutees;
+
+    public CountSupervisor()
+    {
+        _wordCount = new Dictionary<String, Int32>();
+        _numberOfRoutees = 5;
+        _completeRoutees = 0;
+
+        SetupBehaviors();
+    }
+
+    private void SetupBehaviors()
+    {
+        Receive<StartCount>(msg =>
+        {
+            var fileInfo = new FileInfo(msg.FileName);
+            var lineNumber = 0;
+
+            var lineReader = Context.ActorOf(new RoundRobinPool(_numberOfRoutees)
+                                .Props(LineReaderActor.Create()));
+
+            using (var reader = fileInfo.OpenText())
+            {
+                while (!reader.EndOfStream)
+                {
+                    lineNumber++;
+
+                    var line = reader.ReadLine() ?? String.Empty;
+                    lineReader.Tell(new ReadLineForCounting(lineNumber, line));
+                }
+            }
+
+            lineReader.Tell(new Broadcast(new Complete()));
+        });
+
+        Receive<MappedList>(msg =>
+        {
+            foreach (var key in msg.LineWordCount.Keys)
+            {
+                if (_wordCount.ContainsKey(key))
+                {
+                    _wordCount[key] += msg.LineWordCount[key];
+                }
+                else
+                {
+                    _wordCount.Add(key, msg.LineWordCount[key]);
+                }
+            }
+        });
+
+        Receive<Complete>(msg =>
+        {
+            _completeRoutees++;
+
+            if (_completeRoutees == _numberOfRoutees)
+            {
+                var topWords = _wordCount.OrderByDescending(w => w.Value).Take(25);
+                foreach (var word in topWords)
+                {
+                    Console.WriteLine($"{word.Key} == {word.Value} times");
+                }
+            }
+        });
+    }
+}
+```
+
+And that mysterious LineReaderActor? Here we go:
+
+```csharp
+public class LineReaderActor  : ReceiveActor
+{
+    public static Props Create()
+    {
+        return Props.Create(() => new LineReaderActor());
+    }
+
+    public LineReaderActor()
+    {
+        SetupBehaviors();
+    }
+
+    private void SetupBehaviors()
+    {
+        Receive<ReadLineForCounting>(msg =>
+        {
+            var cleanFileContents = Regex.Replace(msg.Line, @"[^\u0000-\u007F]", " ");
+
+            var wordCounts = new Dictionary<String, Int32>();
+
+            var wordArray = cleanFileContents.Split(new char[] { ' ' }, 
+                StringSplitOptions.RemoveEmptyEntries);
+            foreach (var word in wordArray)
+            {
+                if (wordCounts.ContainsKey(word))
+                {
+                    wordCounts[word] += 1;
+                }
+                else
+                {
+                    wordCounts.Add(word, 1);
+                }
+            }
+
+            Sender.Tell(new MappedList(msg.LineNumber, wordCounts));
+        });
+
+        Receive<Complete>(msg =>
+        {
+            Sender.Tell(msg);
+        });
+    }
+}
+```
 
 ## Taking Care of Your Children
