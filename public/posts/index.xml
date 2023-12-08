@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Musings from AgileDave</title>
+    <link>https://dave.agileways.com/posts/</link>
+    <description>Recent content in Posts on Musings from AgileDave</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 07 Dec 2023 17:46:43 -0500</lastBuildDate>
+    <atom:link href="https://dave.agileways.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>The Actor Model in a C# World</title>
+      <link>https://dave.agileways.com/posts/actor-model-dotnet/</link>
+      <pubDate>Thu, 07 Dec 2023 17:46:43 -0500</pubDate>
+      <guid>https://dave.agileways.com/posts/actor-model-dotnet/</guid>
+      <description>What is the Actor Model Why you should care Hello Actor! Taking Care of Your Children </description>
+    </item>
+  </channel>
+</rss>
