@@ -13,7 +13,7 @@
       <link>https://dave.agileways.com/posts/actor-model-dotnet/</link>
       <pubDate>Thu, 07 Dec 2023 17:46:43 -0500</pubDate>
       <guid>https://dave.agileways.com/posts/actor-model-dotnet/</guid>
-      <description>What is the Actor Model Why you should care Hello Actor! Taking Care of Your Children </description>
+      <description>This post is the first in an occasional series on building a distributed system using Akka.NET&#xA;The Actor Model is one of those approaches to system design that, at first, struck me as overly complex, but as I learned more about it, I discovered its simplicity and elegance, and its power. The Actor Model goes back to the 1970s with Carl Hewitt and has gained popularity over time for its ability to provide a simple approach to building highly scalable and concurrent systems.</description>
     </item>
   </channel>
 </rss>

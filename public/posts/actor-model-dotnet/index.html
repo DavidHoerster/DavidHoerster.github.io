@@ -65,7 +65,8 @@
   
   
   
-  <meta name="description" content="What is the Actor Model Why you should care Hello Actor! Taking Care of Your Children " />
+  <meta name="description" content="This post is the first in an occasional series on building a distributed system using Akka.NET
+The Actor Model is one of those approaches to system design that, at first, struck me as overly complex, but as I learned more about it, I discovered its simplicity and elegance, and its power. The Actor Model goes back to the 1970s with Carl Hewitt and has gained popularity over time for its ability to provide a simple approach to building highly scalable and concurrent systems." />
   <meta name="author" content="David Hoerster" />
   
 
@@ -128,13 +129,15 @@
   
   
   <meta itemprop="name" content="The Actor Model in a C# World">
-<meta itemprop="description" content="What is the Actor Model Why you should care Hello Actor! Taking Care of Your Children "><meta itemprop="datePublished" content="2023-12-07T17:46:43-05:00" />
+<meta itemprop="description" content="This post is the first in an occasional series on building a distributed system using Akka.NET
+The Actor Model is one of those approaches to system design that, at first, struck me as overly complex, but as I learned more about it, I discovered its simplicity and elegance, and its power. The Actor Model goes back to the 1970s with Carl Hewitt and has gained popularity over time for its ability to provide a simple approach to building highly scalable and concurrent systems."><meta itemprop="datePublished" content="2023-12-07T17:46:43-05:00" />
 <meta itemprop="dateModified" content="2023-12-07T17:46:43-05:00" />
-<meta itemprop="wordCount" content="16">
+<meta itemprop="wordCount" content="319">
 <meta itemprop="keywords" content="" />
   
   <meta property="og:title" content="The Actor Model in a C# World" />
-<meta property="og:description" content="What is the Actor Model Why you should care Hello Actor! Taking Care of Your Children " />
+<meta property="og:description" content="This post is the first in an occasional series on building a distributed system using Akka.NET
+The Actor Model is one of those approaches to system design that, at first, struck me as overly complex, but as I learned more about it, I discovered its simplicity and elegance, and its power. The Actor Model goes back to the 1970s with Carl Hewitt and has gained popularity over time for its ability to provide a simple approach to building highly scalable and concurrent systems." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://dave.agileways.com/posts/actor-model-dotnet/" /><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2023-12-07T17:46:43-05:00" />
@@ -143,7 +146,8 @@
 
   
   <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="The Actor Model in a C# World"/>
-<meta name="twitter:description" content="What is the Actor Model Why you should care Hello Actor! Taking Care of Your Children "/>
+<meta name="twitter:description" content="This post is the first in an occasional series on building a distributed system using Akka.NET
+The Actor Model is one of those approaches to system design that, at first, struck me as overly complex, but as I learned more about it, I discovered its simplicity and elegance, and its power. The Actor Model goes back to the 1970s with Carl Hewitt and has gained popularity over time for its ability to provide a simple approach to building highly scalable and concurrent systems."/>
 
   
   
@@ -287,10 +291,17 @@
     
   </header>
 
-  <section><h2 id="what-is-the-actor-model">What is the Actor Model</h2>
-<h2 id="why-you-should-care">Why you should care</h2>
+  <section><p><em>This post is the first in an occasional series on building a distributed system using Akka.NET</em></p>
+<p>The Actor Model is one of those approaches to system design that, at first, struck me as overly complex, but as I learned more about it, I discovered its simplicity and elegance, and its power. The <a href="https://en.wikipedia.org/wiki/History_of_the_Actor_model">Actor Model</a> goes back to the 1970s with <a href="https://en.wikipedia.org/wiki/Carl_Hewitt">Carl Hewitt</a> and has gained popularity over time for its ability to provide a simple approach to building highly scalable and concurrent systems.</p>
+<p>(If you want an enjoyable video showing some greats having a discussion about the Actor Model, check out this <a href="https://youtu.be/1zVdhDx7Tbs?si=bK2tx_0XIKC-10ak">informal whiteboard chat</a> with Erik Meijer, Carl Hewitt, and Clemens Szyperski.)</p>
+<h2 id="what-is-the-actor-model">What is the Actor Model</h2>
+<p>So briefly, what is the Actor Model and why should I use it? If you&rsquo;ve had to design a system where you need to create a number of threads to handle some type of concurrent processing and ensure that you don&rsquo;t paint yourself into a deadlock corner, the Actor Model could be a tool to help solve that problem.</p>
+<p>Actor Model systems are characterized by communication via immutable messages between objects called &ldquo;actors&rdquo;. An actor is generally a small, lightweight object that should be specialized in its scope and can have its own state. An actor can communicate with other actors via messages, which are immutable POCOs. Actors are lightweight, cheap to spin up, and should be easy to tear down. Actor systems can see hundreds, thousands or more actors running at any given time.</p>
+<p>Actors, in some actor model frameworks, can create actors of their own (&ldquo;children&rdquo;) and can supervise those child actors. These supervisor actors can determine to tear down, restart, or ignore child actors that potentially get into a bad state.</p>
 <h2 id="hello-actor">Hello Actor!</h2>
-<h2 id="taking-care-of-your-children">Taking Care of Your Children</h2>
+<p>So let&rsquo;s see the codez, right!! Let&rsquo;s use Akka.NET 1.5 to create a simple Actor System:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> system = ActorSystem.Create(<span style="color:#e6db74">&#34;helloAkka&#34;</span>);
+</span></span></code></pre></div><h2 id="taking-care-of-your-children">Taking Care of Your Children</h2>
 </section>
 
   
