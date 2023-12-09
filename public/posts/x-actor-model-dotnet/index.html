@@ -1,0 +1,496 @@
+<!doctype html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready lg:text-base"
+  style="--bg: #fff"
+  lang="en-us"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>The Actor Model in a C# World - Musings from AgileDave</title>
+
+  
+  <meta name="theme-color" />
+
+  
+  
+  
+  
+  <meta name="description" content="This post is the first in an occasional series on building a distributed system using Akka.NET. Check back as I add to this series.
+The Actor Model is one of those approaches to system design that, at first, struck me as overly complex, but as I learned more about it, I discovered its simplicity and elegance, and its power. The Actor Model goes back to the 1970s with Carl Hewitt and has gained popularity over time for its ability to provide a simple approach to building highly scalable and concurrent systems." />
+  <meta name="author" content="David Hoerster" />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://dave.agileways.com/main.min.css" />
+
+  
+  
+  
+  
+  
+  <link rel="preload" as="image" href="https://dave.agileways.com/theme.png" />
+
+  
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/a1b0012c6388edb1e139b5deef63921b?s=160&amp;d=identicon" />
+  
+  
+
+  
+  
+  <link rel="preload" as="image" href="https://dave.agileways.com/twitter.svg" />
+  
+  <link rel="preload" as="image" href="https://dave.agileways.com/github.svg" />
+  
+  <link rel="preload" as="image" href="https://dave.agileways.com/linkedin.svg" />
+  
+  
+
+  
+  
+  <script
+    defer
+    src="https://dave.agileways.com/highlight.min.js"
+    onload="hljs.initHighlightingOnLoad();"
+  ></script>
+  
+
+  
+  
+  
+
+  
+  <link rel="icon" href="https://dave.agileways.com/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://dave.agileways.com/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.121.0">
+
+  
+  
+  
+  
+  
+  <meta itemprop="name" content="The Actor Model in a C# World">
+<meta itemprop="description" content="This post is the first in an occasional series on building a distributed system using Akka.NET. Check back as I add to this series.
+The Actor Model is one of those approaches to system design that, at first, struck me as overly complex, but as I learned more about it, I discovered its simplicity and elegance, and its power. The Actor Model goes back to the 1970s with Carl Hewitt and has gained popularity over time for its ability to provide a simple approach to building highly scalable and concurrent systems."><meta itemprop="datePublished" content="2023-12-07T17:46:43-05:00" />
+<meta itemprop="dateModified" content="2023-12-07T17:46:43-05:00" />
+<meta itemprop="wordCount" content="635">
+<meta itemprop="keywords" content="" />
+  
+  <meta property="og:title" content="The Actor Model in a C# World" />
+<meta property="og:description" content="This post is the first in an occasional series on building a distributed system using Akka.NET. Check back as I add to this series.
+The Actor Model is one of those approaches to system design that, at first, struck me as overly complex, but as I learned more about it, I discovered its simplicity and elegance, and its power. The Actor Model goes back to the 1970s with Carl Hewitt and has gained popularity over time for its ability to provide a simple approach to building highly scalable and concurrent systems." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://dave.agileways.com/posts/x-actor-model-dotnet/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-12-07T17:46:43-05:00" />
+<meta property="article:modified_time" content="2023-12-07T17:46:43-05:00" />
+
+
+  
+  <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="The Actor Model in a C# World"/>
+<meta name="twitter:description" content="This post is the first in an occasional series on building a distributed system using Akka.NET. Check back as I add to this series.
+The Actor Model is one of those approaches to system design that, at first, struck me as overly complex, but as I learned more about it, I discovered its simplicity and elegance, and its power. The Actor Model goes back to the 1970s with Carl Hewitt and has gained popularity over time for its ability to provide a simple approach to building highly scalable and concurrent systems."/>
+
+  
+  
+  
+  <link rel="canonical" href="https://dave.agileways.com/posts/x-actor-model-dotnet/" />
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[4.5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-[1px] text-2xl font-semibold"
+      href="https://dave.agileways.com/"
+      >Musings from AgileDave</a
+    >
+    <div
+      class="btn-dark text-[0] ml-4 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.png)_left_center/_auto_theme('spacing.6')_no-repeat] [transition:_background-position_0.4s_steps(5)] dark:[background-position:right]"
+      role="button"
+      aria-label="Dark"
+    ></div>
+  </div>
+
+  <div
+    class="btn-menu relative z-50 -mr-8 flex h-[4.5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+    role="button"
+    aria-label="Menu"
+  ></div>
+
+  
+
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = '#fff'.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:ml-12 lg:mt-0 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 text-[0] [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./twitter.svg)"
+        href="https://twitter.com/DavidHoerster"
+        target="_blank"
+        rel="me"
+      >
+        twitter
+      </a>
+      
+      <a
+        class="h-8 w-8 text-[0] [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href="https://github.com/DavidHoerster"
+        target="_blank"
+        rel="me"
+      >
+        github
+      </a>
+      
+      <a
+        class="h-8 w-8 text-[0] [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./linkedin.svg)"
+        href="https://linkedin.com/in/DavidHoerster"
+        target="_blank"
+        rel="me"
+      >
+        linkedin
+      </a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-9rem)] max-w-3xl px-8 pb-16 pt-12 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-16">
+    <h1 class="!my-0 pb-2.5">The Actor Model in a C# World</h1>
+
+    
+    <div class="text-sm antialiased opacity-60">
+      
+      <time>Dec 7, 2023</time>
+      
+      
+      
+      
+    </div>
+    
+  </header>
+
+  <section><p><em>This post is the first in an occasional series on building a distributed system using Akka.NET. Check back as I add to this series.</em></p>
+<p>The Actor Model is one of those approaches to system design that, at first, struck me as overly complex, but as I learned more about it, I discovered its simplicity and elegance, and its power. The <a href="https://en.wikipedia.org/wiki/History_of_the_Actor_model">Actor Model</a> goes back to the 1970s with <a href="https://en.wikipedia.org/wiki/Carl_Hewitt">Carl Hewitt</a> and has gained popularity over time for its ability to provide a simple approach to building highly scalable and concurrent systems.</p>
+<p>(If you want an enjoyable video showing some greats having a discussion about the Actor Model, check out this <a href="https://youtu.be/1zVdhDx7Tbs?si=bK2tx_0XIKC-10ak">informal whiteboard chat</a> with Erik Meijer, Carl Hewitt, and Clemens Szyperski.)</p>
+<h2 id="what-is-the-actor-model">What is the Actor Model</h2>
+<p>So briefly, what is the Actor Model and why should I use it? If you&rsquo;ve had to design a system where you need to create a number of threads to handle some type of concurrent processing and ensure that you don&rsquo;t paint yourself into a deadlock corner, the Actor Model could be a tool to help solve that problem.</p>
+<p>Actor Model systems are characterized by communication via immutable messages between objects called &ldquo;actors&rdquo;. An actor is generally a small, lightweight object that should be specialized in its scope and can have its own state. An actor can communicate with other actors via messages, which are immutable POCOs. Actors are lightweight, cheap to spin up, and should be easy to tear down. Actor systems can see hundreds, thousands or more actors running at any given time.</p>
+<p>Actors, in some actor model frameworks, can create actors of their own (&ldquo;children&rdquo;) and can supervise those child actors. These supervisor actors can determine to tear down, restart, or ignore child actors that potentially get into a bad state.</p>
+<h2 id="hello-actor">Hello Actor!</h2>
+<p>So let&rsquo;s see the codez, right!! Let&rsquo;s use Akka.NET 1.5 to create a simple Actor System:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> system = ActorSystem.Create(<span style="color:#e6db74">&#34;helloAkka&#34;</span>);
+</span></span></code></pre></div><p>And let&rsquo;s create the top level supervisor and pass a file to it that we want to get a word count:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> counter = system.ActorOf(CountSupervisor.Create(), <span style="color:#e6db74">&#34;supervisor&#34;</span>);
+</span></span><span style="display:flex;"><span>counter.Tell(<span style="color:#66d9ef">new</span> StartCount(file));
+</span></span></code></pre></div><p>What does that message look like? Well it&rsquo;s a basic POCO class with a simple property on it:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">StartCount</span>(String file)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">readonly</span> String FileName = file;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>And the <code>CountSupervisor</code> actor? There&rsquo;s a bit here, so let&rsquo;s take a look at what&rsquo;s going on:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CountSupervisor</span> : ReceiveActor
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> Props Create()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> Props.Create(() =&gt; <span style="color:#66d9ef">new</span> CountSupervisor());
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Dictionary&lt;String, Int32&gt; _wordCount;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> Int32 _numberOfRoutees;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Int32 _completeRoutees;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> CountSupervisor()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        _wordCount = <span style="color:#66d9ef">new</span> Dictionary&lt;String, Int32&gt;();
+</span></span><span style="display:flex;"><span>        _numberOfRoutees = <span style="color:#ae81ff">5</span>;
+</span></span><span style="display:flex;"><span>        _completeRoutees = <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        SetupBehaviors();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">void</span> SetupBehaviors()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        Receive&lt;StartCount&gt;(msg =&gt;
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">var</span> fileInfo = <span style="color:#66d9ef">new</span> FileInfo(msg.FileName);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">var</span> lineNumber = <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">var</span> lineReader = Context.ActorOf(<span style="color:#66d9ef">new</span> RoundRobinPool(_numberOfRoutees)
+</span></span><span style="display:flex;"><span>                                .Props(LineReaderActor.Create()));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">using</span> (<span style="color:#66d9ef">var</span> reader = fileInfo.OpenText())
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">while</span> (!reader.EndOfStream)
+</span></span><span style="display:flex;"><span>                {
+</span></span><span style="display:flex;"><span>                    lineNumber++;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">var</span> line = reader.ReadLine() ?? String.Empty;
+</span></span><span style="display:flex;"><span>                    lineReader.Tell(<span style="color:#66d9ef">new</span> ReadLineForCounting(lineNumber, line));
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            lineReader.Tell(<span style="color:#66d9ef">new</span> Broadcast(<span style="color:#66d9ef">new</span> Complete()));
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        Receive&lt;MappedList&gt;(msg =&gt;
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> key <span style="color:#66d9ef">in</span> msg.LineWordCount.Keys)
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> (_wordCount.ContainsKey(key))
+</span></span><span style="display:flex;"><span>                {
+</span></span><span style="display:flex;"><span>                    _wordCount[key] += msg.LineWordCount[key];
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>                {
+</span></span><span style="display:flex;"><span>                    _wordCount.Add(key, msg.LineWordCount[key]);
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        Receive&lt;Complete&gt;(msg =&gt;
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            _completeRoutees++;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (_completeRoutees == _numberOfRoutees)
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">var</span> topWords = _wordCount.OrderByDescending(w =&gt; w.Value).Take(<span style="color:#ae81ff">25</span>);
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> word <span style="color:#66d9ef">in</span> topWords)
+</span></span><span style="display:flex;"><span>                {
+</span></span><span style="display:flex;"><span>                    Console.WriteLine(<span style="color:#e6db74">$&#34;{word.Key} == {word.Value} times&#34;</span>);
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>And that mysterious LineReaderActor? Here we go:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">LineReaderActor</span>  : ReceiveActor
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> Props Create()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> Props.Create(() =&gt; <span style="color:#66d9ef">new</span> LineReaderActor());
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> LineReaderActor()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        SetupBehaviors();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">void</span> SetupBehaviors()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        Receive&lt;ReadLineForCounting&gt;(msg =&gt;
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">var</span> cleanFileContents = Regex.Replace(msg.Line, <span style="color:#e6db74">@&#34;[^\u0000-\u007F]&#34;</span>, <span style="color:#e6db74">&#34; &#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">var</span> wordCounts = <span style="color:#66d9ef">new</span> Dictionary&lt;String, Int32&gt;();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">var</span> wordArray = cleanFileContents.Split(<span style="color:#66d9ef">new</span> <span style="color:#66d9ef">char</span>[] { <span style="color:#e6db74">&#39; &#39;</span> }, 
+</span></span><span style="display:flex;"><span>                StringSplitOptions.RemoveEmptyEntries);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> word <span style="color:#66d9ef">in</span> wordArray)
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> (wordCounts.ContainsKey(word))
+</span></span><span style="display:flex;"><span>                {
+</span></span><span style="display:flex;"><span>                    wordCounts[word] += <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>                {
+</span></span><span style="display:flex;"><span>                    wordCounts.Add(word, <span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            Sender.Tell(<span style="color:#66d9ef">new</span> MappedList(msg.LineNumber, wordCounts));
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        Receive&lt;Complete&gt;(msg =&gt;
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            Sender.Tell(msg);
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="taking-care-of-your-children">Taking Care of Your Children</h2>
+</section>
+
+  
+  
+
+  
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 font-semibold no-underline hover:bg-black/[2%] dark:hover:bg-white/[3%]"
+      href="https://dave.agileways.com/posts/actor-model-dotnet/"
+      ><span class="mr-1.5">←</span><span>The Actor Model in a C# World</span></a
+    >
+    
+    
+  </nav>
+  
+  
+
+  
+  
+  <div class="mt-24" id="disqus_thread"></div>
+  <script>
+    const disqusShortname = 'agiledave';
+    const script = document.createElement('script');
+    script.src = 'https://' + disqusShortname + '.disqus.com/embed.js';
+    script.setAttribute('data-timestamp', +new Date());
+    document.head.appendChild(script);
+  </script>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[4.5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://dave.agileways.com/">Musings from AgileDave</a>
+  </div>
+  <a class="link mx-6" href="https://gohugo.io/" rel="noopener" target="_blank"
+    >Powered by Hugo️️</a
+  >️
+  <a
+    class="link"
+    href="https://github.com/nanxiaobei/hugo-paper"
+    rel="noopener"
+    target="_blank"
+    >✎ Paper</a
+  >
+</footer>
+
+  </body>
+</html>
