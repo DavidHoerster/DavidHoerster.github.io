@@ -1,7 +1,7 @@
 +++
 title = 'Thinking Functionally About The Actor Model'
 date = 2023-12-09T11:42:30-05:00
-draft = true
+draft = false
 +++
 
 ## Thinking Functionally
