@@ -480,6 +480,7 @@ In the constructor of <code>CountSupervisor</code> I set up some initial values 
 </span></span><span style="display:flex;"><span>});
 </span></span></code></pre></div><p>The <code>MappedList</code> message contains the results from a single <code>LineReaderActor</code> and the Count just adds the results to its own count.</p>
 <p>And finally, when it receives a <code>Complete</code> message, it updates its count of completed routees (<code>LineReaderActors</code> that it spawned in the round robin pool). If the number of completed routees equals the number of available routees, then the Count knows everyone is complete and it compiles and displays its results to the console.</p>
+<p><img src="./word-count-result.png" alt="The results are in!"></p>
 <h2 id="wrapping-up">Wrapping Up</h2>
 <p>Hopefully with this simple example you can see the power of the Actor Model. It&rsquo;s definitely not a tool to be used for every problem, so definitely investigate if your problem has a need for a concurrent and scalable solution. If so, maybe the Actor Model is for you.</p>
 <p>I&rsquo;ll update this post over the holidays as I build out additional posts in this series.</p>
