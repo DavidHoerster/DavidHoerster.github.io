@@ -248,6 +248,7 @@ The `MappedList` message contains the results from a single `LineReaderActor` an
 
 And finally, when it receives a `Complete` message, it updates its count of completed routees (`LineReaderActors` that it spawned in the round robin pool). If the number of completed routees equals the number of available routees, then the Count knows everyone is complete and it compiles and displays its results to the console.
 
+![The results are in!][results]
 
 ## Wrapping Up
 
@@ -272,3 +273,4 @@ I'll update this post over the holidays as I build out additional posts in this 
 [orleans]: https://github.com/dotnet/orleans
 [protoactor]: https://github.com/asynkron/protoactor-dotnet
 [dapr]: https://docs.dapr.io/developing-applications/building-blocks/actors/actors-overview/
+[results]: ./word-count-result.png
