@@ -58,7 +58,8 @@ We'll create a dotnet console app and then include the Akka.NET nuget package:
 dotnet add package Akka
 ```
 
-We'll assume that I have a little helper method that prompts the user which document they want the word count for (e.g. Declaration of Independence) and the contents of that document will be in a variable named `file`.
+### The Actor System
+We'll assume that I have a little helper method that prompts the user which document they want the word count for (e.g. Declaration of Independence) and the location of that document will be in a variable named `file`.
 
 Let's use Akka.NET 1.5 to create a simple Actor System. The Actor System is essentially the runtime for Akka.NET in your app and instantiates all of the necessary internal actors and threads to manage your actors. You want to create an `ActorSystem` once, as it's a fairly heavy object:
 
@@ -66,6 +67,7 @@ Let's use Akka.NET 1.5 to create a simple Actor System. The Actor System is esse
 var system = ActorSystem.Create("wordCounter");
 ```
 
+### Our First Actor
 The `ActorSystem`, now instantiated, will allow us to create our top level actors and subsequent child actors to process our file and count some words. Let's create the top level supervisor and pass a file to it that we want to get a word count:
 
 ```csharp
@@ -74,6 +76,7 @@ counter.Tell(new StartCount(file));
 ```
 If you look in the code, you'll notice that most of my actors will have a helper static method call `Create` which creates a shortcut way to instantiate an actor. In `CountSupervisor`. In the code above, the `ActorOf` method creates a child actor (and is available on actors to create other children). It takes in a `Props` object, and creating a helper `Create` method on my actors is a consistent pattern of actor creation.
 
+### Diving into CountSupervisor
 ```csharp
 public static Props Create()
 {
@@ -154,6 +157,7 @@ In the constructor of `CountSupervisor` I set up some initial values and then ca
 
 There's an interesting thing in `CountSupervisor`. Since I don't need specific child actors to process lines, I'll just create a pool of child actors and pass lines to them in a round robin fashion using a [RoundRobinPool][roundrobinstrat] routing strategy. Think of it as dealing cards around a table, and we stop when there are no more cards (aka lines) to pass out.
 
+### Don't Forget About Me, the LineReaderActor
 And that mysterious LineReaderActor? Here we go:
 
 ```csharp
